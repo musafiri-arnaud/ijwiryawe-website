@@ -29,7 +29,7 @@ Direct Response and Updates: Through the platform, administrators can directly r
 
 ### Programming languages such as HTML, CSS, Javascript
 
-### Use the citizenconnekt.html to access the website.
+### Use the index.html to access the website.
 
 
 
