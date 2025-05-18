@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citizen Engagement System</title>
+    <script src="https://cdn.tailwindcss.com"></script>                 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .slide-in {
+            animation: slideIn 0.5s ease-out forwards;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .tab-active {
+            border-bottom: 3px solid #3b82f6;
+            color: #3b82f6;
+            font-weight: 600;
+        }
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+        }
+        .status-badge i {
+            margin-right: 0.25rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-100">
+    <!-- Main Container -->
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- Navigation -->
+        <nav class="gradient-bg text-white shadow-md">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-comments text-2xl"></i>
+                    <h1 class="text-xl font-bold">IjwiRyawe</h1>
+                </div>
+                <div class="hidden md:flex space-x-6">
+                    <button onclick="showSection('home')" class="hover:text-blue-200 transition">Home</button>
+                    <button id="submitIssueBtn" onclick="checkAuthBeforeAction('submit')" class="hover:text-blue-200 transition">Submit Issue</button>
+                    <button id="checkStatusBtn" onclick="checkAuthBeforeAction('status')" class="hover:text-blue-200 transition">Check Status</button>
+                    <button id="loginBtn" onclick="showLogin('citizen')" class="hover:text-blue-200 transition">Citizen Login</button>
+                    <button id="adminLoginBtn" onclick="showLogin('admin')" class="hover:text-blue-200 transition">Admin Login</button>
+                    <button id="logoutBtn" onclick="logout()" class="hidden hover:text-blue-200 transition">Logout</button>
+                </div>
+                <button class="md:hidden text-xl" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="hidden md:hidden gradient-bg px-4 pb-4">
+                <div class="flex flex-col space-y-3">
+                    <button onclick="showSection('home')" class="text-left py-2 hover:text-blue-200 transition">Home</button>
+                    <button id="mobileSubmitIssueBtn" onclick="checkAuthBeforeAction('submit')" class="text-left py-2 hover:text-blue-200 transition">Submit Issue</button>
+                    <button id="mobileCheckStatusBtn" onclick="checkAuthBeforeAction('status')" class="text-left py-2 hover:text-blue-200 transition">Check Status</button>
+                    <button id="mobileLoginBtn" onclick="showLogin('citizen')" class="text-left py-2 hover:text-blue-200 transition">Citizen Login</button>
+                    <button id="mobileAdminLoginBtn" onclick="showLogin('admin')" class="text-left py-2 hover:text-blue-200 transition">Admin Login</button>
+                    <button id="mobileLogoutBtn" onclick="logout()" class="hidden text-left py-2 hover:text-blue-200 transition">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto px-4 py-8">
+            <!-- Home Section -->
+            <section id="home" class="slide-in">
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-bold text-gray-800 mb-4">Welcome to IjwiRyawe</h2>
+                    <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                        Your voice matters! Report issues, provide feedback, and track the progress of your submissions with our citizen engagement platform.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-white rounded-lg p-6 card-shadow hover:shadow-lg transition">
+                        <div class="text-blue-600 mb-4">
+                            <i class="fas fa-edit text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Submit Issues</h3>
+                        <p class="text-gray-600">Report problems in your community quickly and easily with our simple form.</p>
+                        <button onclick="checkAuthBeforeAction('submit')" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                            Submit Now
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-lg p-6 card-shadow hover:shadow-lg transition">
+                        <div class="text-green-600 mb-4">
+                            <i class="fas fa-search text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Track Status</h3>
+                        <p class="text-gray-600">Check the progress of your submissions anytime with your unique tracking ID.</p>
+                        <button onclick="checkAuthBeforeAction('status')" class="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                            Check Status
+                        </button>
+                    </div>
+
+                    <div class="bg-white rounded-lg p-6 card-shadow hover:shadow-lg transition">
+                        <div class="text-purple-600 mb-4">
+                            <i class="fas fa-users-cog text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Admin Portal</h3>
+                        <p class="text-gray-600">Government officials can manage and respond to citizen submissions.</p>
+                        <button onclick="showLogin('admin')" class="mt-4 bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition">
+                            Admin Login
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-16 bg-white rounded-lg p-6 card-shadow">
+                    <h3 class="text-2xl font-semibold mb-4 text-center">Recent Activity</h3>
+                    <div id="recentActivity" class="space-y-4">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Submit Issue Section -->
+            <section id="submit" class="hidden slide-in">
+                <div class="max-w-3xl mx-auto bg-white rounded-lg p-6 card-shadow">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">Submit Your Issue or Feedback</h2>
+                        <button onclick="showSection('home')" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <form id="issueForm" class="space-y-6">
+                        <div>
+                            <label for="category" class="block text-sm font-medium text-gray-700 mb-1">Service Category*</label>
+                            <select id="category" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                <option value="" disabled selected>Select a category</option>
+                                <option value="Water">Water</option>
+                                <option value="Electricity">Electricity</option>
+                                <option value="Roads">Roads</option>
+                                <option value="Health">Health</option>
+                                <option value="Waste Management">Waste Management</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="location" class="block text-sm font-medium text-gray-700 mb-1">Location (Optional)</label>
+                            <input type="text" id="location" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="E.g., Main Street, Downtown">
+                        </div>
+
+                        <div>
+                            <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description of Issue/Feedback*</label>
+                            <textarea id="description" required rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="Please provide detailed information about the issue..."></textarea>
+                        </div>
+
+                        <div class="border-t border-gray-200 pt-4">
+                            <h3 class="text-lg font-medium text-gray-900 mb-3">Contact Information</h3>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                                    <input type="text" id="name" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                    <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                                    <input type="tel" id="phone" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center pt-4">
+                            <button type="button" onclick="showSection('home')" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition">
+                                Cancel
+                            </button>
+                            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                                Submit Issue
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Check Status Section -->
+            <section id="status" class="hidden slide-in">
+                <div class="max-w-2xl mx-auto bg-white rounded-lg p-6 card-shadow">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">Check Your Submission Status</h2>
+                        <button onclick="showSection('home')" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <form id="statusForm" class="space-y-6">
+                        <div>
+                            <label for="trackingId" class="block text-sm font-medium text-gray-700 mb-1">Tracking ID*</label>
+                            <input type="text" id="trackingId" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="Enter your tracking ID">
+                        </div>
+
+                        <div class="flex justify-between items-center pt-4">
+                            <button type="button" onclick="showSection('home')" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition">
+                                Back to Home
+                            </button>
+                            <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                                Check Status
+                            </button>
+                        </div>
+                    </form>
+
+                    <div id="statusResult" class="mt-8 hidden">
+                        <h3 class="text-xl font-semibold mb-4">Submission Details</h3>
+                        <div class="bg-gray-50 p-4 rounded-md">
+                            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <p class="text-sm text-gray-500">Tracking ID</p>
+                                    <p id="resultId" class="font-medium"></p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Date Submitted</p>
+                                    <p id="resultDate" class="font-medium"></p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Service Category</p>
+                                    <p id="resultCategory" class="font-medium"></p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Status</p>
+                                    <p id="resultStatus" class="font-medium"></p>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <p class="text-sm text-gray-500">Description</p>
+                                <p id="resultDescription" class="font-medium"></p>
+                            </div>
+                            <div id="resultResponse" class="hidden">
+                                <p class="text-sm text-gray-500">Agency Response</p>
+                                <p id="responseText" class="font-medium"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Citizen Login/Signup Section -->
+            <section id="citizenAuth" class="hidden slide-in">
+                <div class="max-w-md mx-auto bg-white rounded-lg overflow-hidden card-shadow">
+                    <div class="flex border-b">
+                        <button id="citizenLoginTab" class="flex-1 py-4 px-6 text-center font-medium tab-active" onclick="switchAuthTab('citizen', 'login')">
+                            Citizen Login
+                        </button>
+                        <button id="citizenSignupTab" class="flex-1 py-4 px-6 text-center font-medium text-gray-500" onclick="switchAuthTab('citizen', 'signup')">
+                            Citizen Sign Up
+                        </button>
+                    </div>
+
+                    <div id="citizenLoginForm" class="p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Citizen Login</h2>
+                        <form class="space-y-6">
+                            <div>
+                                <label for="citizenEmail" class="block text-sm font-medium text-gray-700 mb-1">Email*</label>
+                                <input type="email" id="citizenEmail" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+
+                            <div>
+                                <label for="citizenPassword" class="block text-sm font-medium text-gray-700 mb-1">Password*</label>
+                                <input type="password" id="citizenPassword" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <input id="rememberMe" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                    <label for="rememberMe" class="ml-2 block text-sm text-gray-700">Remember me</label>
+                                </div>
+                                <a href="#" class="text-sm text-blue-600 hover:text-blue-500">Forgot password?</a>
+                            </div>
+
+                            <div>
+                                <button type="submit" class="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                                    Login
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="mt-6">
+                            <p class="text-center text-sm text-gray-600">
+                                Don't have an account? 
+                                <button onclick="switchAuthTab('citizen', 'signup')" class="text-blue-600 hover:text-blue-500">Sign up here</button>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div id="citizenSignupForm" class="p-6 hidden">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Citizen Sign Up</h2>
+                        <form class="space-y-6">
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="signupFirstName" class="block text-sm font-medium text-gray-700 mb-1">First Name*</label>
+                                    <input type="text" id="signupFirstName" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                                <div>
+                                    <label for="signupLastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name*</label>
+                                    <input type="text" id="signupLastName" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="signupEmail" class="block text-sm font-medium text-gray-700 mb-1">Email*</label>
+                                <input type="email" id="signupEmail" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+
+                            <div>
+                                <label for="signupPhone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                                <input type="tel" id="signupPhone" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+
+                            <div>
+                                <label for="signupPassword" class="block text-sm font-medium text-gray-700 mb-1">Password*</label>
+                                <input type="password" id="signupPassword" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+
+                            <div>
+                                <label for="signupConfirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password*</label>
+                                <input type="password" id="signupConfirmPassword" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+
+                            <div class="flex items-center">
+                                <input id="termsAgreement" type="checkbox" required class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="termsAgreement" class="ml-2 block text-sm text-gray-700">
+                                    I agree to the <a href="#" class="text-blue-600 hover:text-blue-500">Terms of Service</a> and <a href="#" class="text-blue-600 hover:text-blue-500">Privacy Policy</a>
+                                </label>
+                            </div>
+
+                            <div>
+                                <button type="submit" class="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                                    Create Account
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="mt-6">
+                            <p class="text-center text-sm text-gray-600">
+                                Already have an account? 
+                                <button onclick="switchAuthTab('citizen', 'login')" class="text-blue-600 hover:text-blue-500">Login here</button>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Admin Login/Signup Section -->
+            <section id="adminAuth" class="hidden slide-in">
+                <div class="max-w-md mx-auto bg-white rounded-lg overflow-hidden card-shadow">
+                    <div class="flex border-b">
+                        <button id="adminLoginTab" class="flex-1 py-4 px-6 text-center font-medium tab-active" onclick="switchAuthTab('admin', 'login')">
+                            Admin Login
+                        </button>
+                        <button id="adminSignupTab" class="flex-1 py-4 px-6 text-center font-medium text-gray-500" onclick="switchAuthTab('admin', 'signup')">
+                            Admin Sign Up
+                        </button>
+                    </div>
+
+                    <div id="adminLoginForm" class="p-6">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Admin Login</h2>
+                        <form class="space-y-6">
+                            <div>
+                                <label for="adminUsername" class="block text-sm font-medium text-gray-700 mb-1">Username*</label>
+                                <input type="text" id="adminUsername" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+
+                            <div>
+                                <label for="adminPassword" class="block text-sm font-medium text-gray-700 mb-1">Password*</label>
+                                <input type="password" id="adminPassword" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+
+                            <div class="flex items-center">
+                                <input id="adminRemember" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                <label for="adminRemember" class="ml-2 block text-sm text-gray-700">Remember me</label>
+                            </div>
+
+                            <div>
+                                <button type="submit" class="w-full py-2 px-4 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition">
+                                    Login
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="mt-6">
+                            <p class="text-center text-sm text-gray-600">
+                                Need an admin account? 
+                                <button onclick="switchAuthTab('admin', 'signup')" class="text-purple-600 hover:text-purple-500">Request access</button>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div id="adminSignupForm" class="p-6 hidden">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Admin Access Request</h2>
+                        <form class="space-y-6">
+                            <div>
+                                <label for="adminFullName" class="block text-sm font-medium text-gray-700 mb-1">Full Name*</label>
+                                <input type="text" id="adminFullName" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+
+                            <div>
+                                <label for="adminOfficialEmail" class="block text-sm font-medium text-gray-700 mb-1">Official Email*</label>
+                                <input type="email" id="adminOfficialEmail" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+
+                            <div>
+                                <label for="adminDepartment" class="block text-sm font-medium text-gray-700 mb-1">Department/Agency*</label>
+                                <select id="adminDepartment" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="" disabled selected>Select department</option>
+                                    <option value="Water Authority">Water Authority</option>
+                                    <option value="Energy Regulatory Board">Energy Regulatory Board</option>
+                                    <option value="Ministry of Infrastructure">Ministry of Infrastructure</option>
+                                    <option value="Ministry of Health">Ministry of Health</option>
+                                    <option value="City Council">City Council</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div id="otherDepartmentContainer" class="hidden">
+                                <label for="otherDepartment" class="block text-sm font-medium text-gray-700 mb-1">Specify Department</label>
+                                <input type="text" id="otherDepartment" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+
+                            <div>
+                                <label for="adminPosition" class="block text-sm font-medium text-gray-700 mb-1">Position*</label>
+                                <input type="text" id="adminPosition" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+
+                            <div>
+                                <label for="adminRequestReason" class="block text-sm font-medium text-gray-700 mb-1">Reason for Access*</label>
+                                <textarea id="adminRequestReason" rows="3" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
+                            </div>
+
+                            <div>
+                                <button type="submit" class="w-full py-2 px-4 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition">
+                                    Submit Request
+                                </button>
+                            </div>
+                        </form>
+
+                        <div class="mt-6">
+                            <p class="text-center text-sm text-gray-600">
+                                Already have admin access? 
+                                <button onclick="switchAuthTab('admin', 'login')" class="text-purple-600 hover:text-purple-500">Login here</button>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Admin Dashboard Section -->
+            <section id="adminDashboard" class="hidden slide-in">
+                <div class="bg-white rounded-lg overflow-hidden card-shadow">
+                    <div class="gradient-bg text-white p-4 flex justify-between items-center">
+                        <h2 class="text-xl font-bold">Admin Dashboard</h2>
+                        <div class="flex items-center space-x-4">
+                            <span id="adminGreeting" class="font-medium"></span>
+                            <button onclick="logout()" class="px-3 py-1 bg-white text-blue-800 rounded-md text-sm hover:bg-blue-100 transition">
+                                Logout
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="p-4 border-b flex space-x-4">
+                        <button id="allSubmissionsTab" class="px-4 py-2 border-b-2 border-blue-500 text-blue-600 font-medium" onclick="switchAdminTab('all')">
+                            All Submissions
+                        </button>
+                        <button id="pendingSubmissionsTab" class="px-4 py-2 text-gray-600 hover:text-blue-600" onclick="switchAdminTab('pending')">
+                            Pending Review
+                        </button>
+                        <button id="assignedSubmissionsTab" class="px-4 py-2 text-gray-600 hover:text-blue-600" onclick="switchAdminTab('assigned')">
+                            Assigned to Me
+                        </button>
+                    </div>
+
+                    <div class="p-4">
+                        <div class="mb-4 flex justify-between items-center">
+                            <div class="relative w-64">
+                                <input type="text" placeholder="Search submissions..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                <div class="absolute left-3 top-2.5 text-gray-400">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <select id="filterCategory" class="px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">All Categories</option>
+                                    <option value="Water">Water</option>
+                                    <option value="Electricity">Electricity</option>
+                                    <option value="Roads">Roads</option>
+                                    <option value="Health">Health</option>
+                                    <option value="Waste Management">Waste Management</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Summary</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="submissionsTable" class="bg-white divide-y divide-gray-200">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-4 flex justify-between items-center">
+                            <div class="text-sm text-gray-500">
+                                Showing <span id="startItem">1</span> to <span id="endItem">10</span> of <span id="totalItems">25</span> submissions
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50" disabled>
+                                    Previous
+                                </button>
+                                <button class="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Submission Details Section -->
+            <section id="submissionDetails" class="hidden slide-in">
+                <div class="bg-white rounded-lg overflow-hidden card-shadow">
+                    <div class="gradient-bg text-white p-4 flex justify-between items-center">
+                        <h2 class="text-xl font-bold">Submission Details</h2>
+                        <button onclick="switchAdminTab('all')" class="px-3 py-1 bg-white text-blue-800 rounded-md text-sm hover:bg-blue-100 transition">
+                            Back to Dashboard
+                        </button>
+                    </div>
+
+                    <div class="p-6">
+                        <div class="grid md:grid-cols-2 gap-6 mb-8">
+                            <div>
+                                <h3 class="text-lg font-semibold mb-4">Submission Information</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <p class="text-sm text-gray-500">Tracking ID</p>
+                                        <p id="detailId" class="font-medium">CES-2023-001234</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">Date Submitted</p>
+                                        <p id="detailDate" class="font-medium">June 15, 2023 14:30</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">Service Category</p>
+                                        <p id="detailCategory" class="font-medium">Roads</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">Location</p>
+                                        <p id="detailLocation" class="font-medium">Main Street between 5th and 6th Ave</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <h3 class="text-lg font-semibold mb-4">Status Information</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <p class="text-sm text-gray-500">Current Status</p>
+                                        <p id="detailStatus" class="font-medium">Under Review</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">Assigned Agency</p>
+                                        <p id="detailAgency" class="font-medium">Ministry of Infrastructure</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">Assigned To</p>
+                                        <p id="detailAssignedTo" class="font-medium">John Smith</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-500">Last Updated</p>
+                                        <p id="detailUpdated" class="font-medium">June 16, 2023 09:15</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-8">
+                            <h3 class="text-lg font-semibold mb-4">Issue Description</h3>
+                            <div class="bg-gray-50 p-4 rounded-md">
+                                <p id="detailDescription">There's a large pothole on Main Street between 5th and 6th Avenue that's been growing over the past month. It's now about 2 feet wide and 6 inches deep, causing damage to vehicles that drive over it. This is a busy area with many businesses and pedestrian traffic.</p>
+                            </div>
+                        </div>
+
+                        <div class="mb-8">
+                            <h3 class="text-lg font-semibold mb-4">Citizen Information</h3>
+                            <div class="grid md:grid-cols-3 gap-4">
+                                <div>
+                                    <p class="text-sm text-gray-500">Name</p>
+                                    <p id="detailCitizenName" class="font-medium">Sarah Johnson</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Email</p>
+                                    <p id="detailCitizenEmail" class="font-medium">sarah.johnson@example.com</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Phone</p>
+                                    <p id="detailCitizenPhone" class="font-medium">(555) 123-4567</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form id="adminResponseForm" class="space-y-6">
+                            <div>
+                                <label for="assignAgency" class="block text-sm font-medium text-gray-700 mb-1">Assign to Agency*</label>
+                                <select id="assignAgency" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="" disabled selected>Select agency</option>
+                                    <option value="Water Authority">Water Authority</option>
+                                    <option value="Energy Regulatory Board">Energy Regulatory Board</option>
+                                    <option value="Ministry of Infrastructure">Ministry of Infrastructure</option>
+                                    <option value="Ministry of Health">Ministry of Health</option>
+                                    <option value="City Council">City Council</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="updateStatus" class="block text-sm font-medium text-gray-700 mb-1">Update Status*</label>
+                                <select id="updateStatus" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="Submitted" selected>Submitted</option>
+                                    <option value="Under Review">Under Review</option>
+                                    <option value="Addressed">Addressed</option>
+                                    <option value="Closed">Closed</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="adminResponse" class="block text-sm font-medium text-gray-700 mb-1">Response to Citizen*</label>
+                                <textarea id="adminResponse" required rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" placeholder="Enter your response to the citizen..."></textarea>
+                            </div>
+
+                            <div class="flex justify-end space-x-4 pt-4">
+                                <button type="button" onclick="switchAdminTab('all')" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition">
+                                    Cancel
+                                </button>
+                                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">
+                                    Save Response
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="gradient-bg text-white py-8">
+            <div class="container mx-auto px-4">
+                <div class="grid md:grid-cols-4 gap-8">
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">IjwiRyawe</h3>
+                        <p class="text-sm text-blue-100">
+                            Bridging the gap between Rwandan citizens and their government through transparent communication and efficient issue resolution.
+                        </p>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-sm text-blue-100 hover:text-white transition">Home</a></li>
+                            <li><a href="#" class="text-sm text-blue-100 hover:text-white transition">Submit Issue</a></li>
+                            <li><a href="#" class="text-sm text-blue-100 hover:text-white transition">Check Status</a></li>
+                            <li><a href="#" class="text-sm text-blue-100 hover:text-white transition">FAQ</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Resources</h3>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-sm text-blue-100 hover:text-white transition">Privacy Policy</a></li>
+                            <li><a href="#" class="text-sm text-blue-100 hover:text-white transition">Terms of Service</a></li>
+                            <li><a href="#" class="text-sm text-blue-100 hover:text-white transition">Contact Us</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4">Connect With Us</h3>
+                        <div class="flex space-x-4">
+                            <a href="#" class="text-blue-100 hover:text-white transition"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="text-blue-100 hover:text-white transition"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="text-blue-100 hover:text-white transition"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="text-blue-100 hover:text-white transition"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                        <div class="mt-4">
+                            <p class="text-sm text-blue-100">Email: info@ijwiryawe.gov.rw</p>
+                            <p class="text-sm text-blue-100">Phone: +250785807512</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-8 pt-6 border-t border-blue-700 text-center text-sm text-blue-100">
+                    <p>&copy; 2025 IjwiRyawe. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Sample database for demonstration
+        const database = {
+            submissions: [
+                {
+                    id: 'CES-2025-001234',
+                    date: '2025-05-17T14:30:00',
+                    category: 'Roads',
+                    location: 'Nyamirambo',
+                    description: 'Bivugwa ko hari icyobo cyinini mu muhanda mugari. Ubu cyikaba cyimaze kugera kuri feet 24 ujya hasi bigatuma cyangiza ibinyabiziga bigenda hafi yacyo Kandi uyu akaba ari umuhanda ugendwamo cyane n/ibinyabiziga biturutse mu mihanda igiye itandukanye.',
+                    name: 'UWASE Nicole',
+                    email: 'nicoleuwase@gmail.com',
+                    phone: '+250788883269',
+                    status: 'Under Review',
+                    assignedAgency: 'Ministry of Infrastructure',
+                    assignedTo: 'Dr KAMANZI Alex',
+                    response: 'Thank you for reporting this issue. We have assigned it to our road maintenance team and they will inspect the pothole within 48 hours. Temporary repairs will be made within 3 business days if needed, with permanent repairs scheduled for the next maintenance cycle.',
+                    updated: '2025-05-17 T 09:15:00',
+                    citizenId: 'nicoleuwase@gmail.com'
+                },
+                {
+                    id: 'CES-2025-001235',
+                    date: '2025-05-18T09:45:00',
+                    category: 'Waste Management',
+                    location: 'Kanombe',
+                    description: 'Ibikoresho rusange by’imyanda i Kanombe bimaze icyumweru cyose byuzuye. Aka gace gatangiye guhumura nabi no gukurura udukoko twanduza.',
+                    name: 'ISHIMWE Eric',
+                    email: 'ericishimwe16@gmail.com',
+                    phone: '+250788889905',
+                    status: 'Submitted',
+                    assignedAgency: 'MINISANTE',
+                    assignedTo: 'RUKUNDO Jean De La Croix',
+                    response: '',
+                    updated: '2025-05-21T09:45:00',
+                    citizenId: 'ericishimwe16@gmail.com'
+                },
+                {
+                    id: 'CES-2025-001236',
+                    date: '2025-03-14T18:20:00',
+                    category: 'Electricity',
+                    location: 'MUSANZE',
+                    description: 'Itara ryo mu muhanda kuri MUSANZE Avenue rimaze iminsi rimurika ritikiza kandi rimwe na rimwe rigacika burundu nijoro. Ibi biteza ikibazo cy’umutekano ku bagenzi n’abatwara ibinyabiziga muri ako gace.',
+                    name: 'MFITUMUKIZA Karangwa Joseph',
+                    email: 'karangwajo20@gmail.com',
+                    phone: '+250785221470',
+                    status: 'Addressed',
+                    assignedAgency: 'Energy Regulatory Board',
+                    assignedTo: 'KABATESI Joy',
+                    response: 'Our maintenance crew has replaced the faulty street light. The new LED fixture should provide better illumination and last longer. Thank you for bringing this to our attention.',
+                    updated: '2025-06-16T16:30:00',
+                    citizenId: 'karangwajo20@gmail.com.com'
+                }
+            ],
+            adminUsers: [
+                { username: 'admin', password: 'admin123', name: 'Admin User', department: 'Administration' }
+            ],
+            citizenUsers: [
+                { email: 'user@example.com', password: 'user123', name: 'Test User' }
+            ]
+        };
+
+        // Current user state
+        let currentUser = null;
+        let isAdmin = false;
+
+        // DOM Ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the home page
+            showSection('home');
+            populateRecentActivity();
+
+            // Form submissions
+            document.getElementById('issueForm').addEventListener('submit', handleIssueSubmission);
+            document.getElementById('statusForm').addEventListener('submit', handleStatusCheck);
+
+            // Admin login forms
+            document.querySelector('#citizenLoginForm form').addEventListener('submit', handleCitizenLogin);
+            document.querySelector('#citizenSignupForm form').addEventListener('submit', handleCitizenSignup);
+            document.querySelector('#adminLoginForm form').addEventListener('submit', handleAdminLogin);
+            document.querySelector('#adminSignupForm form').addEventListener('submit', handleAdminSignup);
+
+            // Admin dashboard forms
+            document.getElementById('adminResponseForm').addEventListener('submit', handleAdminResponse);
+
+            // Department selection
+            document.getElementById('adminDepartment').addEventListener('change', function() {
+                const otherContainer = document.getElementById('otherDepartmentContainer');
+                otherContainer.classList.toggle('hidden', this.value !== 'Other');
+            });
+        });
+
+        // Navigation functions
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('main > section').forEach(section => {
+                section.classList.add('hidden');
+            });
+
+            // Show the requested section
+            document.getElementById(sectionId).classList.remove('hidden');
+        }
+
+        function checkAuthBeforeAction(action) {
+            if (!currentUser) {
+                alert('Please login first to access this feature.');
+                showLogin('citizen');
+            } else {
+                if (action === 'submit') {
+                    showSection('submit');
+                } else if (action === 'status') {
+                    showSection('status');
+                }
+            }
+        }
+
+        function showLogin(userType) {
+            showSection(userType + 'Auth');
+            switchAuthTab(userType, 'login');
+        }
+
+        function switchAuthTab(userType, tab) {
+            // Reset all tabs for this user type
+            document.querySelectorAll(`#${userType}Auth button`).forEach(btn => {
+                btn.classList.remove('tab-active', 'text-blue-600');
+                btn.classList.add('text-gray-500');
+            });
+
+            // Hide all forms for this user type
+            document.querySelectorAll(`#${userType}Auth > div > div`).forEach(form => {
+                form.classList.add('hidden');
+            });
+
+            // Activate the selected tab
+            const tabButton = document.getElementById(`${userType}${tab.charAt(0).toUpperCase() + tab.slice(1)}Tab`);
+            tabButton.classList.add('tab-active');
+            tabButton.classList.remove('text-gray-500');
+
+            // Show the corresponding form
+            document.getElementById(`${userType}${tab.charAt(0).toUpperCase() + tab.slice(1)}Form`).classList.remove('hidden');
+        }
+
+        function toggleMobileMenu() {
+            document.getElementById('mobileMenu').classList.toggle('hidden');
+        }
+
+        function updateNavForLoggedInUser() {
+            if (currentUser) {
+                // Desktop navigation
+                document.getElementById('loginBtn').classList.add('hidden');
+                document.getElementById('adminLoginBtn').classList.add('hidden');
+                document.getElementById('logoutBtn').classList.remove('hidden');
+                
+                // Mobile navigation
+                document.getElementById('mobileLoginBtn').classList.add('hidden');
+                document.getElementById('mobileAdminLoginBtn').classList.add('hidden');
+                document.getElementById('mobileLogoutBtn').classList.remove('hidden');
+                
+                // Enable submit and check status buttons
+                document.getElementById('submitIssueBtn').removeAttribute('disabled');
+                document.getElementById('checkStatusBtn').removeAttribute('disabled');
+                document.getElementById('mobileSubmitIssueBtn').removeAttribute('disabled');
+                document.getElementById('mobileCheckStatusBtn').removeAttribute('disabled');
+            } else {
+                // Desktop navigation
+                document.getElementById('loginBtn').classList.remove('hidden');
+                document.getElementById('adminLoginBtn').classList.remove('hidden');
+                document.getElementById('logoutBtn').classList.add('hidden');
+                
+                // Mobile navigation
+                document.getElementById('mobileLoginBtn').classList.remove('hidden');
+                document.getElementById('mobileAdminLoginBtn').classList.remove('hidden');
+                document.getElementById('mobileLogoutBtn').classList.add('hidden');
+                
+                // Disable submit and check status buttons
+                document.getElementById('submitIssueBtn').setAttribute('disabled', 'true');
+                document.getElementById('checkStatusBtn').setAttribute('disabled', 'true');
+                document.getElementById('mobileSubmitIssueBtn').setAttribute('disabled', 'true');
+                document.getElementById('mobileCheckStatusBtn').setAttribute('disabled', 'true');
+            }
+        }
+
+        // Form handlers
+        function handleIssueSubmission(e) {
+            e.preventDefault();
+
+            // Generate a unique ID
+            const id = 'CES-' + new Date().getFullYear() + '-' + Math.floor(100000 + Math.random() * 900000);
+            const now = new Date();
+
+            // Create new submission
+            const newSubmission = {
+                id: id,
+                date: now.toISOString(),
+                category: document.getElementById('category').value,
+                location: document.getElementById('location').value || 'Not specified',
+                description: document.getElementById('description').value,
+                name: document.getElementById('name').value || 'Anonymous',
+                email: document.getElementById('email').value || '',
+                phone: document.getElementById('phone').value || '',
+                status: 'Submitted',
+                assignedAgency: '',
+                assignedTo: '',
+                response: '',
+                updated: now.toISOString(),
+                citizenId: currentUser.email
+            };
+
+            // Add to database
+            database.submissions.push(newSubmission);
+
+            // Show confirmation
+            alert(`Thank you for your submission! Your tracking ID is: ${id}\nPlease save this ID to check the status of your submission later.`);
+
+            // Reset form
+            document.getElementById('issueForm').reset();
+            showSection('home');
+            populateRecentActivity();
+        }
+
+        function handleStatusCheck(e) {
+            e.preventDefault();
+
+            const trackingId = document.getElementById('trackingId').value.trim();
+            const submission = database.submissions.find(sub => sub.id === trackingId);
+
+            if (submission) {
+                // Check if the current user is the owner or an admin
+                if (!isAdmin && submission.citizenId !== currentUser.email) {
+                    alert('You can only view the status of your own submissions.');
+                    return;
+                }
+
+                // Display the submission details
+                document.getElementById('resultId').textContent = submission.id;
+                document.getElementById('resultDate').textContent = formatDate(submission.date);
+                document.getElementById('resultCategory').textContent = submission.category;
+                document.getElementById('resultStatus').textContent = submission.status;
+                document.getElementById('resultDescription').textContent = submission.description;
+
+                if (submission.response) {
+                    document.getElementById('responseText').textContent = submission.response;
+                    document.getElementById('resultResponse').classList.remove('hidden');
+                } else {
+                    document.getElementById('resultResponse').classList.add('hidden');
+                }
+
+                document.getElementById('statusResult').classList.remove('hidden');
+            } else {
+                alert('No submission found with that tracking ID. Please check the ID and try again.');
+            }
+        }
+
+        function handleCitizenLogin(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('citizenEmail').value;
+            const password = document.getElementById('citizenPassword').value;
+
+            const user = database.citizenUsers.find(u => u.email === email && u.password === password);
+
+            if (user) {
+                currentUser = user;
+                isAdmin = false;
+                updateNavForLoggedInUser();
+                alert('Login successful!');
+                showSection('home');
+            } else {
+                alert('Invalid email or password. Please try again.');
+            }
+        }
+
+        function handleCitizenSignup(e) {
+            e.preventDefault();
+
+            const firstName = document.getElementById('signupFirstName').value;
+            const lastName = document.getElementById('signupLastName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('signupConfirmPassword').value;
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match. Please try again.');
+                return;
+            }
+
+            // Check if user already exists
+            if (database.citizenUsers.some(u => u.email === email)) {
+                alert('An account with this email already exists. Please login instead.');
+                return;
+            }
+
+            // Create new user
+            const newUser = {
+                email: email,
+                password: password,
+                name: `${firstName} ${lastName}`
+            };
+
+            database.citizenUsers.push(newUser);
+            currentUser = newUser;
+            isAdmin = false;
+            updateNavForLoggedInUser();
+
+            alert('Account created successfully! You are now logged in.');
+            showSection('home');
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+
+            const user = database.adminUsers.find(u => u.username === username && u.password === password);
+
+            if (user) {
+                currentUser = user;
+                isAdmin = true;
+                updateNavForLoggedInUser();
+
+                // Update admin greeting
+                document.getElementById('adminGreeting').textContent = `Welcome, ${user.name}`;
+
+                // Show admin dashboard
+                showAdminDashboard();
+            } else {
+                alert('Invalid username or password. Please try again.');
+            }
+        }
+
+        function handleAdminSignup(e) {
+            e.preventDefault();
+
+            const fullName = document.getElementById('adminFullName').value;
+            const email = document.getElementById('adminOfficialEmail').value;
+            const department = document.getElementById('adminDepartment').value;
+            const position = document.getElementById('adminPosition').value;
+            const reason = document.getElementById('adminRequestReason').value;
+
+            // In a real app, this would send a request to admins for approval
+            alert('Your request for admin access has been submitted. You will receive an email once your account has been approved.');
+            showSection('home');
+        }
+
+        function showAdminDashboard() {
+            // Hide all sections
+            document.querySelectorAll('main > section').forEach(section => {
+                section.classList.add('hidden');
+            });
+
+            // Show admin dashboard
+            document.getElementById('adminDashboard').classList.remove('hidden');
+
+            // Populate submissions table
+            populateSubmissionsTable();
+        }
+
+        function switchAdminTab(filter) {
+            // Update active tab styling
+            document.getElementById('allSubmissionsTab').classList.remove('border-b-2', 'border-blue-500', 'text-blue-600');
+            document.getElementById('pendingSubmissionsTab').classList.remove('border-b-2', 'border-blue-500', 'text-blue-600');
+            document.getElementById('assignedSubmissionsTab').classList.remove('border-b-2', 'border-blue-500', 'text-blue-600');
+
+            document.getElementById('allSubmissionsTab').classList.add('text-gray-600', 'hover:text-blue-600');
+            document.getElementById('pendingSubmissionsTab').classList.add('text-gray-600', 'hover:text-blue-600');
+            document.getElementById('assignedSubmissionsTab').classList.add('text-gray-600', 'hover:text-blue-600');
+
+            // Activate the selected tab
+            let activeTab;
+            switch(filter) {
+                case 'all':
+                    activeTab = document.getElementById('allSubmissionsTab');
+                    break;
+                case 'pending':
+                    activeTab = document.getElementById('pendingSubmissionsTab');
+                    break;
+                case 'assigned':
+                    activeTab = document.getElementById('assignedSubmissionsTab');
+                    break;
+            }
+
+            activeTab.classList.add('border-b-2', 'border-blue-500', 'text-blue-600');
+            activeTab.classList.remove('text-gray-600', 'hover:text-blue-600');
+
+            // Filter submissions
+            populateSubmissionsTable(filter);
+        }
+
+        function populateSubmissionsTable(filter = 'all') {
+            const tableBody = document.getElementById('submissionsTable');
+            tableBody.innerHTML = '';
+
+            let filteredSubmissions = [...database.submissions];
+
+            // Apply filters
+            if (filter === 'pending') {
+                filteredSubmissions = filteredSubmissions.filter(sub => sub.status === 'Submitted');
+            } else if (filter === 'assigned') {
+                filteredSubmissions = filteredSubmissions.filter(sub => 
+                    sub.assignedTo === currentUser.name && sub.status !== 'Closed'
+                );
+            }
+
+            // Sort by date (newest first)
+            filteredSubmissions.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            // Populate table
+            filteredSubmissions.forEach(sub => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${sub.id}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formatDate(sub.date)}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${sub.category}</td>
+                    <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">${sub.description}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="status-badge ${getStatusClass(sub.status)}">
+                            ${getStatusIcon(sub.status)} ${sub.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onclick="viewSubmissionDetails('${sub.id}')" class="text-blue-600 hover:text-blue-900">View</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            // Update pagination info
+            document.getElementById('startItem').textContent = 1;
+            document.getElementById('endItem').textContent = filteredSubmissions.length;
+            document.getElementById('totalItems').textContent = filteredSubmissions.length;
+        }
+
+        function viewSubmissionDetails(id) {
+            const submission = database.submissions.find(sub => sub.id === id);
+            if (!submission) return;
+
+            // Populate details
+            document.getElementById('detailId').textContent = submission.id;
+            document.getElementById('detailDate').textContent = formatDate(submission.date);
+            document.getElementById('detailCategory').textContent = submission.category;
+            document.getElementById('detailLocation').textContent = submission.location;
+            document.getElementById('detailStatus').textContent = submission.status;
+            document.getElementById('detailAgency').textContent = submission.assignedAgency || 'Not assigned';
+            document.getElementById('detailAssignedTo').textContent = submission.assignedTo || 'Not assigned';
+            document.getElementById('detailUpdated').textContent = formatDate(submission.updated);
+            document.getElementById('detailDescription').textContent = submission.description;
+            document.getElementById('detailCitizenName').textContent = submission.name;
+            document.getElementById('detailCitizenEmail').textContent = submission.email || 'Not provided';
+            document.getElementById('detailCitizenPhone').textContent = submission.phone || 'Not provided';
+
+            // Set form values
+            document.getElementById('assignAgency').value = submission.assignedAgency || '';
+            document.getElementById('updateStatus').value = submission.status;
+            document.getElementById('adminResponse').value = submission.response || '';
+
+            // Hide admin dashboard and show details
+            document.getElementById('adminDashboard').classList.add('hidden');
+            document.getElementById('submissionDetails').classList.remove('hidden');
+        }
+
+        function handleAdminResponse(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('detailId').textContent;
+            const submission = database.submissions.find(sub => sub.id === id);
+            if (!submission) return;
+
+            // Update submission
+            submission.assignedAgency = document.getElementById('assignAgency').value;
+            submission.status = document.getElementById('updateStatus').value;
+            submission.response = document.getElementById('adminResponse').value;
+            submission.updated = new Date().toISOString();
+
+            if (isAdmin) {
+                submission.assignedTo = currentUser.name;
+            }
+
+            alert('Response saved successfully!');
+
+            // Go back to dashboard
+            switchAdminTab('all');
+        }
+
+        function logout() {
+            currentUser = null;
+            isAdmin = false;
+            updateNavForLoggedInUser();
+            showSection('home');
+        }
+
+        // Helper functions
+        function populateRecentActivity() {
+            const container = document.getElementById('recentActivity');
+            container.innerHTML = '';
+
+            // Get submissions for current user or all if admin
+            let userSubmissions = [];
+            if (currentUser) {
+                if (isAdmin) {
+                    userSubmissions = [...database.submissions];
+                } else {
+                    userSubmissions = database.submissions.filter(sub => sub.citizenId === currentUser.email);
+                }
+            } else {
+                // Show some public submissions when not logged in
+                userSubmissions = database.submissions.slice(0, 2);
+            }
+
+            // Get 3 most recent submissions
+            const recentSubmissions = userSubmissions
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 3);
+
+            if (recentSubmissions.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500">No recent activity to display</p>';
+                return;
+            }
+
+            recentSubmissions.forEach(sub => {
+                const item = document.createElement('div');
+                item.className = 'bg-gray-50 p-4 rounded-lg';
+                item.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-medium text-gray-800">${sub.category} Issue</h4>
+                            <p class="text-sm text-gray-500 mt-1">${sub.description.substring(0, 100)}...</p>
+                        </div>
+                        <span class="status-badge ${getStatusClass(sub.status)}">
+                            ${getStatusIcon(sub.status)} ${sub.status}
+                        </span>
+                    </div>
+                    <div class="mt-3 flex justify-between items-center text-sm">
+                        <span class="text-gray-500">${formatDate(sub.date)}</span>
+                        <button onclick="checkStatus('${sub.id}')" class="text-blue-600 hover:text-blue-800">View Details</button>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function checkStatus(id) {
+            if (!currentUser) {
+                alert('Please login to view submission details.');
+                showLogin('citizen');
+                return;
+            }
+            
+            document.getElementById('trackingId').value = id;
+            showSection('status');
+            document.getElementById('statusForm').dispatchEvent(new Event('submit'));
+        }
+
+        function formatDate(isoString) {
+            const date = new Date(isoString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'Submitted': return 'bg-yellow-100 text-yellow-800';
+                case 'Under Review': return 'bg-blue-100 text-blue-800';
+                case 'Addressed': return 'bg-green-100 text-green-800';
+                case 'Closed': return 'bg-gray-100 text-gray-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        function getStatusIcon(status) {
+            switch(status) {
+                case 'Submitted': return '<i class="fas fa-inbox"></i>';
+                case 'Under Review': return '<i class="fas fa-search"></i>';
+                case 'Addressed': return '<i class="fas fa-check-circle"></i>';
+                case 'Closed': return '<i class="fas fa-archive"></i>';
+                default: return '<i class="fas fa-circle"></i>';
+            }
+        }
+    </script>
+</body>
+</html>
